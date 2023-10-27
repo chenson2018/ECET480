@@ -58,8 +58,8 @@ static cl::opt<std::string> FileName(cl::Positional,
 
 // TODO - uncomment for your assignment
 // void printInstructionList(Function &F) {
-//     for (/**/) {
-//         for (/**/) {
+//     for (/**/) { // Fill in this section to iterate through each basic block in the function
+//         for (/**/) { // Fill in this section to iterate through each instruction in the basic block
                // Do something with each instruction I, e.g., print it:
 //             I->print(errs());
 //             errs() << "\n";
@@ -128,6 +128,7 @@ int main(int argc, char** argv)
      *    * 'return -1;' exits the program with a return code of -1, indicating an error occurred.
      *
      * */
+
     ErrorOr<std::unique_ptr<MemoryBuffer>> mb =
         MemoryBuffer::getFile(FileName);
     if (std::error_code ec = mb.getError())
