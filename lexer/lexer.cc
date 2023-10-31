@@ -142,7 +142,7 @@ bool Lexer::getToken(Token &tok)
         {
             tok = Token(Token::TokenType::TOKEN_EOF);
             return false;
-seps.insert({'&', Token::TokenType::TOKEN_AMPERSAND});        }
+        }
 
         parseLine(line);
     }
@@ -173,59 +173,11 @@ void Lexer::parseLine(std::string &line)
         if (auto sep_iter = seps.find(*iter); 
             sep_iter != seps.end())
         {
-            auto prev_non_empty_iter = findPrevNonEmptyChar(iter, line.begin());
+            std::string literal = cur_token_str;
+            Token::TokenType type = sep_iter->second;
+            Token _tok(type, literal, cur_line);
 
-            // Check for negative numbers
-            if (*iter == '-' && 
-		    
-                (
-
-                // - at the start of the line
-                iter == line.begin() ||
-
-                // previous token is an arith or related 
-                (seps.find(*prev_non_empty_iter) != seps.end() && 
-		 *prev_non_empty_iter != ')' && *prev_non_empty_iter != ']')
-
-                ) && 
-
-                (iter + 1 != line.end() && isdigit(*(iter + 1))))
-
-            {
-	    
-                // '-' is part of a negative number, continue parsing the number
-                cur_token_str.push_back(*(++iter));
-
-                while (iter + 1 != line.end() && 
-                       *(iter + 1) != ' ' && 
-                       *(iter + 1) != '\t' &&
-                       seps.find(*(iter + 1)) == seps.end())
-                {
-                    cur_token_str.push_back(*(++iter));
-                }
-
-                if (isType<int>(cur_token_str))
-                {
-                    Token::TokenType type = Token::TokenType::TOKEN_INT;
-                    Token _tok(type, cur_token_str, cur_line);
-                    toks_per_line.push(_tok);
-                }
-                else if (isType<float>(cur_token_str))
-                {
-                    Token::TokenType type = Token::TokenType::TOKEN_FLOAT;
-                    Token _tok(type, cur_token_str, cur_line);
-                    toks_per_line.push(_tok);
-                }
-            }
-            else
-            {
-                std::string literal = cur_token_str;
-                Token::TokenType type = sep_iter->second;
-                Token _tok(type, literal, cur_line);
-
-                toks_per_line.push(_tok);
-
-            }
+            toks_per_line.push(_tok);
                 
             continue;
         }
