@@ -1,0 +1,468 @@
+{
+  Function Name: func1
+  Return Type: int
+  Arguments
+    int : x
+  Codes
+  {
+    {
+      [Return]
+      x
+    }
+  }
+}
+{
+  Function Name: func2
+  Return Type: int
+  Arguments
+    int : x
+    int : y
+  Codes
+  {
+    {
+      [Return]
+        x
+        +
+        y
+    }
+  }
+}
+{
+  Function Name: main
+  Return Type: int
+  Arguments
+    NONE
+  Codes
+  {
+    {
+      x
+      =
+      1
+    }
+    {
+      y
+      =
+      2
+    }
+    {
+      z
+      =
+      3
+    }
+    {
+      a
+      =
+      4
+    }
+    {
+      b
+      =
+      5
+    }
+    {
+      c
+      =
+      6
+    }
+    {
+      d
+      =
+      7
+    }
+    {
+      e
+      =
+      8
+    }
+    {
+      f
+      =
+      9
+    }
+    {
+      g
+      =
+      10.0
+    }
+    {
+      array
+      =
+        {
+          [ARRAY] 
+          [NUM ELEMENTS]
+          {
+            5
+          }
+          [ELEMENTS]
+          {
+            {
+              0
+            }
+            {
+              7
+            }
+            {
+              8
+            }
+            {
+              10
+            }
+            {
+              -5
+            }
+          }
+        }
+    }
+  {
+  [For Statement] 
+  [Start]
+    {
+      i
+      =
+        {
+          [CALL] func1
+          [ARG 0]
+          {
+            a
+          }
+        }
+    }
+  [End]
+  {
+    [Left]
+      i
+
+    [COMP] <
+
+    [Right]
+      {
+        [CALL] func2
+        [ARG 0]
+        {
+          b
+        }
+        [ARG 1]
+        {
+          c
+        }
+      }
+
+  }
+  [Step]
+    {
+      i
+      =
+        i
+        +
+        1
+    }
+  [Block]
+  {
+    {
+      x
+      =
+        y
+        +
+        z
+    }
+  }
+  }
+  {
+  [For Statement] 
+  [Start]
+    {
+      i
+      =
+      0
+    }
+  [End]
+  {
+    [Left]
+      i
+
+    [COMP] <
+
+    [Right]
+      {
+        [ARRAY] array
+        [INDEX]
+        {
+            2
+        }
+      }
+
+  }
+  [Step]
+    {
+      i
+      =
+        i
+        +
+        1
+    }
+  [Block]
+  {
+  {
+  [For Statement] 
+  [Start]
+    {
+      k
+      =
+        {
+          [CALL] func1
+          [ARG 0]
+          {
+            i
+          }
+        }
+    }
+  [End]
+  {
+    [Left]
+      k
+
+    [COMP] <
+
+    [Right]
+      {
+        [ARRAY] array
+        [INDEX]
+        {
+            2
+        }
+      }
+
+  }
+  [Step]
+    {
+      k
+      =
+        k
+        +
+        1
+    }
+  [Block]
+  {
+    {
+      y
+      =
+        z
+        *
+        x
+    }
+  }
+  }
+  }
+  }
+  {
+  [For Statement] 
+  [Start]
+    {
+      i
+      =
+      0
+    }
+  [End]
+  {
+    [Left]
+      {
+        [CALL] func2
+        [ARG 0]
+        {
+          i
+        }
+        [ARG 1]
+        {
+          {
+            [ARRAY] array
+            [INDEX]
+            {
+                1
+            }
+          }
+        }
+      }
+
+    [COMP] <
+
+    [Right]
+      100
+
+  }
+  [Step]
+    {
+      i
+      =
+          i
+          *
+          2
+        +
+        1
+    }
+  [Block]
+  {
+  {
+  [For Statement] 
+  [Start]
+    {
+      j
+      =
+      0.9
+    }
+  [End]
+  {
+    [Left]
+      j
+
+    [COMP] <
+
+    [Right]
+      10.0
+
+  }
+  [Step]
+    {
+      j
+      =
+        j
+        +
+        0.1
+    }
+  [Block]
+  {
+    {
+      g
+      =
+        g
+        +
+        j
+    }
+  }
+  }
+    {
+      a
+      =
+        b
+        -
+        c
+    }
+  }
+  }
+  {
+  [For Statement] 
+  [Start]
+    {
+      i
+      =
+        {
+          [CALL] func1
+          [ARG 0]
+          {
+            a
+          }
+        }
+    }
+  [End]
+  {
+    [Left]
+      i
+
+    [COMP] <
+
+    [Right]
+      {
+        [CALL] func2
+        [ARG 0]
+        {
+          b
+        }
+        [ARG 1]
+        {
+          c
+        }
+      }
+
+  }
+  [Step]
+    {
+      i
+      =
+        i
+        +
+          {
+            [ARRAY] array
+            [INDEX]
+            {
+                1
+            }
+          }
+    }
+  [Block]
+  {
+    {
+      d
+      =
+        e
+        +
+        f
+    }
+  }
+  }
+  {
+  [For Statement] 
+  [Start]
+    {
+      i
+      =
+        {
+          [ARRAY] array
+          [INDEX]
+          {
+              0
+          }
+        }
+    }
+  [End]
+  {
+    [Left]
+      {
+        [ARRAY] array
+        [INDEX]
+        {
+            1
+        }
+      }
+
+    [COMP] <
+
+    [Right]
+      20
+
+  }
+  [Step]
+    {
+      i
+      =
+        i
+        +
+        {
+          [CALL] func1
+          [ARG 0]
+          {
+            i
+          }
+        }
+    }
+  [Block]
+  {
+    {
+      a
+      =
+        b
+        *
+        c
+    }
+  }
+  }
+  }
+}
