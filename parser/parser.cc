@@ -242,9 +242,8 @@ std::unique_ptr<Statement> Parser::parseAssnStatement()
             exit(0);
         }
 
-        std::unique_ptr<Expression> iden =
-            std::make_unique<LiteralExpression>(cur_token);
-        advanceTokens();
+        cur_expr_type = ValueType::Type::MAX;
+        auto iden = parseExpression();
 	
         assert(cur_token.isTokenEqual());
         advanceTokens();
