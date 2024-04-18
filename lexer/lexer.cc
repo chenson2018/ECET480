@@ -173,13 +173,21 @@ void Lexer::parseLine(std::string &line)
         if (auto sep_iter = seps.find(*iter); 
             sep_iter != seps.end())
         {
-            std::string literal = cur_token_str;
+	    bool binary_minus = true;
             Token::TokenType type = sep_iter->second;
-            Token _tok(type, literal, cur_line);
 
-            toks_per_line.push(_tok);
-                
-            continue;
+	    // note the lookahead to require that negative literals are numeric
+    	    if (type == Token::TokenType::TOKEN_MINUS) {
+	       char prev = *findPrevNonEmptyChar(iter, line.begin());
+	       binary_minus = !std::isdigit(*(iter + 1)) || prev == ']'|| std::isalnum(prev);
+	    }	    
+
+	    if (binary_minus) {
+               std::string literal = cur_token_str;
+               Token _tok(type, literal, cur_line);
+               toks_per_line.push(_tok);
+               continue;
+	    }
         }
 
         // (3) parse the token
