@@ -697,6 +697,40 @@ std::unique_ptr<Expression> Parser::parseFactor()
 {
     std::unique_ptr<Expression> left;
 
+    if (cur_token.isTokenPlus()) {
+       advanceTokens();
+       left = parseFactor();
+       return left;
+    }
+
+    if (cur_token.isTokenMinus()) {
+        // move past the - token
+	advanceTokens();
+
+	// get the factor
+        std::unique_ptr<Expression> right = parseFactor();
+
+	// using the type of the factor, create corresponding zero token
+	Token::TokenType type;
+	std::string zero;
+
+	if (cur_expr_type == ValueType::Type::INT) {
+           zero = "0";
+	   type = Token::TokenType::TOKEN_INT;
+	} else if (cur_expr_type == ValueType::Type::FLOAT) {
+           zero = "0.0";
+	   type = Token::TokenType::TOKEN_FLOAT;
+	} else {
+	   std::cerr << "[Error] invalid unary operation" << std::endl;
+	}
+
+	Token _tok(type, zero);
+	left = std::make_unique<LiteralExpression>(_tok);
+
+	// return 0 - factor
+	return std::make_unique<ArithExpression>(left, right, Expression::ExpressionType::MINUS);
+    }
+
     if (cur_token.isTokenLP())
     {
         advanceTokens();
