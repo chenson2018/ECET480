@@ -138,7 +138,9 @@ void Parser::parseStatement(std::string &cur_func_name,
 
     if (cur_token.isTokenFor())
     {
-        assert(false && "For statements are not supported yet!");
+       auto code = parseForStatement(cur_func_name);
+       codes.push_back(std::move(code));
+       return;
     }
 
     // is it a function call?
@@ -535,7 +537,65 @@ std::unique_ptr<Statement> Parser::parseIfStatement(std::string&
 std::unique_ptr<Statement> Parser::parseForStatement(std::string& 
                                                      parent_func_name)
 {
-    return nullptr;
+    std::vector<std::shared_ptr<Statement>> for_block_codes;
+    std::unordered_map<std::string,ValueType::Type> for_block_local_vars;
+    local_vars_tracker.push_back(&for_block_local_vars);
+
+    // move past "for"
+    advanceTokens();
+
+    // move past "("
+    assert(cur_token.isTokenLP());
+    advanceTokens();
+ 
+    // get the initial value, move past semicolon
+    auto start = parseAssnStatement();
+    assert(cur_token.isTokenSemicolon());
+    advanceTokens();
+    
+    // get the condition, move past semicolon
+    auto end = parseCondition();
+    assert(cur_token.isTokenSemicolon());
+    advanceTokens();
+ 
+    // get the reassignment, move past ")"
+    auto step = parseAssnStatement();
+    assert(cur_token.isTokenRP());
+    advanceTokens();
+
+    // Parse for block
+    assert(cur_token.isTokenLBrace());
+
+    while (true)
+    {
+        advanceTokens();
+        if (cur_token.isTokenRBrace())
+            break;
+
+        parseStatement(parent_func_name, for_block_codes);
+        // We just finished an if/for statement
+        if (for_block_codes.back()->isStatementIf() ||
+            for_block_codes.back()->isStatementFor())
+        {
+            // This RBrace is from the statement,
+            // should not terminate.
+            assert(cur_token.isTokenRBrace());
+        }
+        else
+        {
+            if (cur_token.isTokenRBrace())
+                break;
+        }
+    }
+    assert(cur_token.isTokenRBrace());
+    local_vars_tracker.pop_back();
+    
+    std::unique_ptr<Statement> for_statement = 
+        std::make_unique<ForStatement>(start, end, step, for_block_codes, for_block_local_vars);
+    
+    assert(cur_token.isTokenRBrace());
+    
+    return for_statement;
 }
 
 
