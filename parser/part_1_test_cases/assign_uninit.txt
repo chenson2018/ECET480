@@ -1,0 +1,9 @@
+void func1()
+{
+   int x;
+   float y;
+   x = 1;
+   y = 1.0;
+   int z = 1;
+   float w = 1.0;
+}

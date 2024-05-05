@@ -216,10 +216,25 @@ std::unique_ptr<Statement> Parser::parseAssnStatement()
         if (!is_array)
         {
             advanceTokens();
-            assert(cur_token.isTokenEqual());
-
-            advanceTokens();
-            expr = parseExpression();
+            
+	    if (cur_token.isTokenEqual()) {
+               advanceTokens();
+               expr = parseExpression();
+	    } else {
+               // the assignment doesn't specify behavior of accessing
+	       // this unitialized variables, so I used this constructor that 
+	       // only requires a type
+	       if (type_token.getTokenType() == Token::TokenType::TOKEN_INT) {
+                  Token::TokenType type = Token::TokenType::TOKEN_INT;
+                  Token _tok(type);
+	          expr = std::make_unique<LiteralExpression>(_tok);
+	       }
+	       if (type_token.getTokenType() == Token::TokenType::TOKEN_FLOAT) {
+                  Token::TokenType type = Token::TokenType::TOKEN_FLOAT;
+                  Token _tok(type);
+	          expr = std::make_unique<LiteralExpression>(_tok);
+	       }
+            }
         }
         else
         {
@@ -789,15 +804,19 @@ void AssnStatement::printStatement()
     }
 
     std::cout << "      =\n";
-    if (expr->getType() == Expression::ExpressionType::LITERAL)
-    {
-        std::cout << "      " << expr->print(4);
-    }
-    else
-    {
-        std::cout << expr->print(4);
-    }
 
+    // might have an uninitialized assignment
+    // which will be printed as just "{{iden}} ="
+    if (expr != NULL) {
+       if (expr->getType() == Expression::ExpressionType::LITERAL)
+       {
+           std::cout << "      " << expr->print(4);
+       }
+       else
+       {
+           std::cout << expr->print(4);
+       }
+    }
     std::cout << "    }\n";
 }
 

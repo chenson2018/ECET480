@@ -1,0 +1,37 @@
+{
+  Function Name: func1
+  Return Type: void
+  Arguments
+    NONE
+  Codes
+  {
+    {
+      x
+      =
+    }
+    {
+      y
+      =
+    }
+    {
+      x
+      =
+      1
+    }
+    {
+      y
+      =
+      1.0
+    }
+    {
+      z
+      =
+      1
+    }
+    {
+      w
+      =
+      1.0
+    }
+  }
+}
