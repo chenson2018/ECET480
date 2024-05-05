@@ -67,6 +67,8 @@ std::string Token::prinTokenType()
             return std::string("ELSE");
         case TokenType::TOKEN_FOR:
             return std::string("FOR");
+        case TokenType::TOKEN_WHILE:
+            return std::string("WHILE");
         default:
             std::cerr << "[Error] prinTokenType: "
                       << "unsupported token type. \n";
@@ -108,6 +110,7 @@ Lexer::Lexer(const char* fn)
     keywords.insert({"if", Token::TokenType::TOKEN_IF});
     keywords.insert({"else", Token::TokenType::TOKEN_ELSE});
     keywords.insert({"for", Token::TokenType::TOKEN_FOR});
+    keywords.insert({"while", Token::TokenType::TOKEN_WHILE});
 }
 
 bool Lexer::getToken(Token &tok)
