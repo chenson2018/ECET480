@@ -13,11 +13,44 @@
 #include <memory>
 #include <string>
 #include <cstdlib>
+#include <iostream>
 
 using namespace llvm;
 
 /* Unrolling Section - Adjust Loop Control */
 void adjustLoopControl(Loop *L, size_t unroll_factor, LLVMContext &Context) {
+
+	// update the ending value		
+	if (BasicBlock *ExitingBlock = L->getExitingBlock()) {
+	  for (Instruction &I : *ExitingBlock) {
+            if (CmpInst *CmpI = dyn_cast<CmpInst>(&I)) {
+	      for (int OpIdx = 0; OpIdx < 2; ++OpIdx) {
+	        Value *Op = CmpI->getOperand(OpIdx);
+	        if (auto *CI = dyn_cast<ConstantInt>(Op)) {
+		  int new_end = CI->getSExtValue() / unroll_factor;
+		  Value *new_end_llvm = ConstantInt::get(Op->getType(), new_end);
+		  CmpI->setOperand(OpIdx, new_end_llvm); 
+                }
+	      }
+	    }
+	  }	
+	}
+
+	// update the step
+	if (BasicBlock *LatchBlock = L->getLoopLatch()) {
+	  for (auto I = LatchBlock->rbegin(); I != LatchBlock->rend(); ++I) {
+	    if (auto *BI = dyn_cast<BinaryOperator>(&*I)) {
+	      if ((BI->getOpcode() == Instruction::Add || BI->getOpcode() == Instruction::Sub)) {
+	        if (ConstantInt *StepVal = dyn_cast<ConstantInt>(BI->getOperand(1))) {
+		  int old_step =  (BI->getOpcode() == Instruction::Sub) ? -StepVal->getSExtValue() : StepVal->getSExtValue();
+		  int new_step = old_step * unroll_factor;
+		  Value *new_step_llvm = ConstantInt::get(StepVal->getType(), new_step);
+		  BI->setOperand(1, new_step_llvm);
+	        }
+              }
+           }
+          }
+	}
 }
 
 void cloneLoopBody(Loop *L, size_t unroll_factor, LLVMContext &Context) {
