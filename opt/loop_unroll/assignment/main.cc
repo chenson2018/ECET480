@@ -36,6 +36,44 @@ void adjustLoopControl(Loop *L, size_t unroll_factor, LLVMContext &Context) {
 }
 
 void cloneLoopBody(Loop *L, size_t unroll_factor, LLVMContext &Context) {
+	BasicBlock *Latch = L->getLoopLatch();
+	
+	if (!Latch) {
+	  errs() << "Could not find latch block.\n";
+	  return;
+	}
+
+	Function *ParentFunction = Latch->getParent();
+	
+	// Create a new basic block for the cloned body
+	BasicBlock *ClonedBody = BasicBlock::Create(Context,
+						    Latch->getName() + ".cloned",
+						    ParentFunction,
+						    Latch);
+	
+	IRBuilder<> ClonedBodyBuilder(ClonedBody);
+	
+	for (size_t i = 0; i < unroll_factor - 1; i++) {
+	  for (Instruction &Inst : *Latch) {
+	    Instruction *ClonedInst = Inst.clone();
+	    ClonedBodyBuilder.Insert(ClonedInst);
+	    if (isa<StoreInst>(Inst)) break;
+	  }
+	}
+
+	IRBuilder<> LatchBuilder(Latch);
+	
+	// Move the insertion point to just before the terminator instruction of Latch
+	LatchBuilder.SetInsertPoint(Latch->getTerminator());
+
+	// Move instructions from ClonedBody to Latch
+	while (!ClonedBody->empty()) {
+	  Instruction &Inst = ClonedBody->front();
+	  Inst.removeFromParent();
+	  LatchBuilder.Insert(&Inst);
+	}
+	
+	ClonedBody->eraseFromParent();
 }
 
 void unrollLoop(Loop *L, size_t unroll_factor, LLVMContext &Context) 
