@@ -14,9 +14,43 @@
 using namespace llvm;
 
 void removeRedundantLoads(Function &F) {
+  for (BasicBlock &BB : F) {
+    auto it = BB.begin();
+    bool past_add = false;
+    while(it != BB.end()) {
+      Instruction &Inst = *it;
+      ++it;
+
+      if (isa<BinaryOperator>(Inst)) {
+        past_add = true;
+      }
+
+      if (past_add && isa<LoadInst>(Inst)) {
+        Inst.replaceAllUsesWith(Inst.getOperand(0)); 
+        Inst.eraseFromParent();
+      }
+    }
+  }
 }
 
 void removeRedundantBinaryOps(Function &F) {
+  for (BasicBlock &BB : F) {
+    auto it = BB.begin();
+    Instruction *first_add = nullptr;
+
+    while(it != BB.end()) {
+      Instruction &Inst = *it;
+      ++it;
+      if (isa<BinaryOperator>(Inst)) {
+	if (first_add == nullptr) {
+	  first_add = &Inst;
+	} else {
+          Inst.replaceAllUsesWith(first_add); 
+          Inst.eraseFromParent();
+	}
+      }
+    }
+  }
 }
 
 
