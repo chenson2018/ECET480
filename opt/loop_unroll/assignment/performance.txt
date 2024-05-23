@@ -1,0 +1,49 @@
+Factor: 0
+1000000000
+
+real	0m0.954s
+user	0m0.953s
+sys	0m0.000s
+
+Factor: 2
+1000000000
+
+real	0m0.461s
+user	0m0.454s
+sys	0m0.000s
+
+Factor: 4
+1000000000
+
+real	0m0.232s
+user	0m0.231s
+sys	0m0.000s
+
+Factor: 10
+1000000000
+
+real	0m0.093s
+user	0m0.093s
+sys	0m0.000s
+
+Factor: 20
+1000000000
+
+real	0m0.046s
+user	0m0.046s
+sys	0m0.000s
+
+Factor: 50
+1000000000
+
+real	0m0.019s
+user	0m0.019s
+sys	0m0.000s
+
+Factor: 100
+1000000000
+
+real	0m0.010s
+user	0m0.010s
+sys	0m0.000s
+

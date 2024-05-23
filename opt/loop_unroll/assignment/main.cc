@@ -52,10 +52,23 @@ void cloneLoopBody(Loop *L, size_t unroll_factor, LLVMContext &Context) {
 						    Latch);
 	
 	IRBuilder<> ClonedBodyBuilder(ClonedBody);
-	
+
+	// pointer to the previously used instruction
+	Instruction *prev;
+
 	for (size_t i = 0; i < unroll_factor - 1; i++) {
 	  for (Instruction &Inst : *Latch) {
+	    // clone the original instruction
 	    Instruction *ClonedInst = Inst.clone();
+
+	    // update the operand with new lhs
+	    if (isa<BinaryOperator>(Inst) || isa<StoreInst>(Inst)) {
+	      ClonedInst->setOperand(0, prev);
+	    } 
+
+	    // update pointer to previous instruction
+	    prev = ClonedInst;
+
 	    ClonedBodyBuilder.Insert(ClonedInst);
 	    if (isa<StoreInst>(Inst)) break;
 	  }
