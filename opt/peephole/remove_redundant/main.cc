@@ -10,44 +10,59 @@
 #include "llvm/Support/raw_ostream.h"
 #include <memory>
 #include <map>
+#include<tuple> 
 
 using namespace llvm;
 
 void removeRedundantLoads(Function &F) {
-  for (BasicBlock &BB : F) {
-    auto it = BB.begin();
-    bool past_add = false;
-    while(it != BB.end()) {
-      Instruction &Inst = *it;
-      ++it;
-
-      if (isa<BinaryOperator>(Inst)) {
-        past_add = true;
-      }
-
-      if (past_add && isa<LoadInst>(Inst)) {
-        Inst.replaceAllUsesWith(Inst.getOperand(0)); 
-        Inst.eraseFromParent();
-      }
+  std::map<Value*, LoadInst*> lastLoad;
+  
+  for (auto &B : F) {
+    lastLoad.clear();
+    for (auto Inst = B.begin(), E = B.end(); Inst != E;) {
+      Instruction *I = &*Inst++;
+      if (auto *LI = dyn_cast<LoadInst>(I)) {
+        Value *ptr = LI->getPointerOperand();
+	if (lastLoad.find(ptr) != lastLoad.end()) {
+	  LI->replaceAllUsesWith(lastLoad[ptr]);
+	  LI->eraseFromParent();
+	  continue;
+	} else {
+	  lastLoad[ptr] = LI;
+	}
+      } else if (I->mayWriteToMemory()) {
+	 if (auto *SI = dyn_cast<StoreInst>(I)) {
+	   Value *ptr = SI->getPointerOperand();
+	   lastLoad.erase(ptr);
+	 }
+      } 
     }
-  }
+  }    
 }
 
 void removeRedundantBinaryOps(Function &F) {
-  for (BasicBlock &BB : F) {
-    auto it = BB.begin();
-    Instruction *first_add = nullptr;
-
-    while(it != BB.end()) {
-      Instruction &Inst = *it;
-      ++it;
-      if (isa<BinaryOperator>(Inst)) {
-	if (first_add == nullptr) {
-	  first_add = &Inst;
-	} else {
-          Inst.replaceAllUsesWith(first_add); 
-          Inst.eraseFromParent();
-	}
+  std::map<Value*, BinaryOperator*> lastAdd;
+  
+  for (auto &B : F) {
+    lastAdd.clear();
+    for (auto Inst = B.begin(), E = B.end(); Inst != E;) {
+      Instruction *I = &*Inst++;
+      if (auto *AI = dyn_cast<BinaryOperator>(I)) {
+        Value *ptr_lhs = AI->getOperand(0);
+        Value *ptr_rhs = AI->getOperand(1);
+        if (lastAdd.find(ptr_lhs) != lastAdd.end() && lastAdd.find(ptr_rhs) != lastAdd.end()) {
+          AI->replaceAllUsesWith(lastAdd[ptr_lhs]);
+          AI->eraseFromParent();
+          continue;
+        } else {
+          lastAdd[ptr_lhs] = AI;
+          lastAdd[ptr_rhs] = AI;
+        }
+      } else if (I->mayWriteToMemory()) {
+         if (auto *SI = dyn_cast<StoreInst>(I)) {
+           Value *ptr = SI->getPointerOperand();
+           lastAdd.erase(ptr);
+         }
       }
     }
   }
